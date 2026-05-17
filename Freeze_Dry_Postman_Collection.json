@@ -1,0 +1,322 @@
+{
+  "info": {
+    "name": "Freeze Dry Backend APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Public (Bina Login Ke)",
+      "item": [
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "Get All Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/products",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products"]
+                }
+              }
+            },
+            {
+              "name": "Search Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/products?search=apple",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products"],
+                  "query": [{ "key": "search", "value": "apple" }]
+                }
+              }
+            },
+            {
+              "name": "Get Single Product",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/products/PRODUCT_ID_HERE",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "products", "PRODUCT_ID_HERE"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Get All Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/categories",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "categories"]
+                }
+              }
+            },
+            {
+              "name": "Get Category by Slug",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/categories/fruits",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "categories", "fruits"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Create Order",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"items\": [{ \"product\": \"PRODUCT_ID_HERE\", \"quantity\": 2 }],\n  \"totalAmount\": 150,\n  \"customerDetails\": {\n    \"name\": \"Ali\",\n    \"phone\": \"03001234567\",\n    \"address\": \"Karachi\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Get Order by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/orders/ORDER_ID_HERE",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "orders", "ORDER_ID_HERE"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Settings",
+          "item": [
+            {
+              "name": "Get Settings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/settings",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "settings"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Admin (Login Ke Baad)",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Admin Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if(jsonData.token) {",
+                      "    pm.collectionVariables.set(\"admin_token\", jsonData.token);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"freezedry2025\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "login"]
+                }
+              }
+            },
+            {
+              "name": "Verify Token (Me)",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "me"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Products",
+          "item": [
+            {
+              "name": "Get All Admin Products",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "products"]
+                }
+              }
+            },
+            {
+              "name": "Create Product",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "nameEn", "value": "Apple", "type": "text" },
+                    { "key": "nameAr", "value": "تفاحة", "type": "text" },
+                    { "key": "price", "value": "100", "type": "text" },
+                    { "key": "isVisible", "value": "true", "type": "text" },
+                    { "key": "category", "value": "CATEGORY_ID", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "products"]
+                }
+              }
+            },
+            {
+              "name": "Toggle Visibility",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/PRODUCT_ID/visibility",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "products", "PRODUCT_ID", "visibility"]
+                }
+              }
+            },
+            {
+              "name": "Delete Product",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/PRODUCT_ID",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "products", "PRODUCT_ID"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Categories",
+          "item": [
+            {
+              "name": "Create Category",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "nameEn", "value": "Fruits", "type": "text" },
+                    { "key": "nameAr", "value": "فواكه", "type": "text" },
+                    { "key": "slug", "value": "fruits", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/categories",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "categories"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Orders",
+          "item": [
+            {
+              "name": "Get All Orders",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Change Order Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"DELIVERED\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/orders/ORDER_ID/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "orders", "ORDER_ID", "status"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
