@@ -15,6 +15,8 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 const allowedOrigins = [
+  'https://freezdry.net',
+  'https://www.freezdry.net',
   'https://arabic-frontend.vercel.app',
   'https://lightgreen-woodcock-596987.hostingersite.com',
   'http://localhost:5173',
