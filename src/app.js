@@ -10,8 +10,10 @@ const errorHandler = require('./middleware/errorHandler');
 // Initialize App
 const app = express();
 
-// Required for Vercel/Proxies
-app.set('trust proxy', 1);
+// Root/Heartbeat Route to check if API is alive
+app.get('/api/heartbeat', (req, res) => {
+  res.json({ success: true, message: 'Server is alive' });
+});
 
 // Security Middleware
 app.use(helmet({
