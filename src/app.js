@@ -41,19 +41,19 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Public Routes
-app.use('/api/categories', publicLimiter, require('./routes/public/categories'));
-app.use('/api/products', publicLimiter, require('./routes/public/products'));
-app.use('/api/orders', publicLimiter, require('./routes/public/orders'));
-app.use('/api/settings', publicLimiter, require('./routes/public/settings'));
+app.use('/api/categories', require('./routes/public/categories'));
+app.use('/api/products', require('./routes/public/products'));
+app.use('/api/orders', require('./routes/public/orders'));
+app.use('/api/settings', require('./routes/public/settings'));
 
 // Admin Routes
-app.use('/api/admin', adminLimiter, require('./routes/admin/auth'));
-app.use('/api/admin/products', adminLimiter, require('./routes/admin/products'));
-app.use('/api/admin/categories', adminLimiter, require('./routes/admin/categories'));
-app.use('/api/admin/orders', adminLimiter, require('./routes/admin/orders'));
-app.use('/api/admin/settings', adminLimiter, require('./routes/admin/settings'));
-app.use('/api/admin/upload', adminLimiter, require('./routes/admin/upload'));
-app.use('/api/admin/reset', adminLimiter, require('./routes/admin/reset'));
+app.use('/api/admin', require('./routes/admin/auth'));
+app.use('/api/admin/products', require('./routes/admin/products'));
+app.use('/api/admin/categories', require('./routes/admin/categories'));
+app.use('/api/admin/orders', require('./routes/admin/orders'));
+app.use('/api/admin/settings', require('./routes/admin/settings'));
+app.use('/api/admin/upload', require('./routes/admin/upload'));
+app.use('/api/admin/reset', require('./routes/admin/reset'));
 
 // Root Route
 app.get('/', (req, res) => {
