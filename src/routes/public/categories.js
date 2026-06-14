@@ -6,10 +6,11 @@ const Product = require('../../models/Product');
 // GET /api/categories → list all categories
 router.get('/', async (req, res, next) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
-    res.json({ success: true, data: categories });
+    const categories = await Category.find().sort({ createdAt: -1 }).lean();
+    res.json({ success: true, data: categories || [] });
   } catch (error) {
-    next(error);
+    console.error('Categories Fetch Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
