@@ -19,7 +19,8 @@ router.put('/', async (req, res, next) => {
     await settings.save();
     res.json({ success: true, data: settings });
   } catch (error) {
-    next(error);
+    console.error('Settings Update Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
