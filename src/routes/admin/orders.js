@@ -12,10 +12,20 @@ router.get('/', async (req, res, next) => {
     const query = {};
     if (status) query.status = status;
 
-    const orders = await Order.find(query).sort({ createdAt: -1 });
-    res.json({ success: true, data: orders });
+    const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
+    
+    // Ensure every order has defaults to avoid frontend crashes
+    const safeOrders = orders.map(order => ({
+      ...order,
+      customerAddress: order.customerAddress || '',
+      items: order.items || [],
+      status: order.status || 'PENDING'
+    }));
+
+    res.json({ success: true, data: safeOrders });
   } catch (error) {
-    next(error);
+    console.error('Fetch Orders Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

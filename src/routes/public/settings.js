@@ -16,7 +16,8 @@ router.get('/', async (req, res, next) => {
     }
     res.json({ success: true, data: settings });
   } catch (error) {
-    next(error);
+    console.error('Settings Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
