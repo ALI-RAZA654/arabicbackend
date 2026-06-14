@@ -10,21 +10,24 @@ const errorHandler = require('./middleware/errorHandler');
 // Initialize App
 const app = express();
 
+// Required for Vercel/Proxies
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
+
 const allowedOrigins = [
   'https://freezdry.net',
   'https://www.freezdry.net',
   'https://arabic-frontend.vercel.app',
   'https://lightgreen-woodcock-596987.hostingersite.com',
-  'http://localhost:5173',
-  process.env.CORS_ORIGIN
-].filter(Boolean);
+  'http://localhost:5173'
+];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
