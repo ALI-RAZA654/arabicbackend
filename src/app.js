@@ -12,7 +12,13 @@ const app = express();
 
 // Root/Heartbeat Route to check if API is alive
 app.get('/api/heartbeat', (req, res) => {
-  res.json({ success: true, message: 'Server is alive' });
+  const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+  res.json({ 
+    success: true, 
+    message: 'Server is alive',
+    database: dbStatus,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Security Middleware
