@@ -10,6 +10,7 @@ router.use(authMiddleware);
 // PUT /api/admin/settings
 router.put('/', async (req, res, next) => {
   try {
+    console.log('Settings Data Received:', req.body);
     let settings = await Settings.findOne();
     if (!settings) {
       settings = new Settings(req.body);
@@ -19,8 +20,8 @@ router.put('/', async (req, res, next) => {
     await settings.save();
     res.json({ success: true, data: settings });
   } catch (error) {
-    console.error('Settings Update Error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Settings Update ERROR:', error);
+    res.status(500).json({ success: false, message: error.message, stack: error.stack });
   }
 });
 

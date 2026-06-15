@@ -93,11 +93,13 @@ router.patch('/:id/visibility', async (req, res, next) => {
 // DELETE /api/admin/products/:id
 router.delete('/:id', async (req, res, next) => {
   try {
+    console.log('Deleting product ID:', req.params.id);
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, message: 'Product deleted' });
   } catch (error) {
-    next(error);
+    console.error('DELETE Product ERROR:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
