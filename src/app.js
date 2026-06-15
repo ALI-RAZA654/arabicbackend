@@ -65,7 +65,17 @@ app.use(errorHandler);
 
 // Database Connection
 const PORT = process.env.PORT || 3001;
-mongoose.connect(process.env.MONGODB_URI)
+const MONGODB_URI = process.env.MONGODB_URI;
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10, // Maintain up to 10 socket connections
+  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  family: 4 // Use IPv4, skip trying IPv6
+};
+
+mongoose.connect(MONGODB_URI, options)
   .then(() => {
     console.log('Connected to MongoDB');
   })
