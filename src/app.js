@@ -65,17 +65,52 @@ app.get('/', (req, res) => {
 // Error Handling
 app.use(errorHandler);
 
-// Database Connection
-const MONGODB_URI = process.env.MONGODB_URI;
+// Database Connection (Serverless Pattern)
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
-mongoose.connect(MONGODB_URI, {
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 20000,
-  socketTimeoutMS: 45000,
-  family: 4
-})
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error('MongoDB Initial Connection Error:', err));
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    const opts = {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 30000, // 30s
+      socketTimeoutMS: 45000,
+      family: 4
+    };
+
+    console.log('Connecting to MongoDB...');
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((m) => {
+      console.log('MongoDB Connected');
+      return m;
+    }).catch(err => {
+      console.error('MongoDB Error:', err.message);
+      cached.promise = null;
+      throw err;
+    });
+  }
+  
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+// Middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('DB Connection FAIL:', err.message);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database Connection Error',
+      error: err.message 
+    });
+  }
+});
 
 // Export app for Vercel
 module.exports = app;
