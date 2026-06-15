@@ -87,22 +87,22 @@ async function connectDB() {
 
   if (!cached.promise) {
     const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 20000, // Increase to 20s
       socketTimeoutMS: 45000,
-      family: 4,
-      bufferCommands: false
+      family: 4
     };
 
+    // Global buffering disable
+    mongoose.set('bufferCommands', false);
+
     console.log('Starting NEW database connection...');
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
       console.log('MongoDB Connected successfully!');
-      return mongoose;
+      return m;
     }).catch(err => {
       console.error('CRITICAL Database Connection Error:', err.message);
-      cached.promise = null; // Reset for next attempt
+      cached.promise = null; 
       throw err;
     });
   }
