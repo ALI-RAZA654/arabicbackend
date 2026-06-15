@@ -17,9 +17,11 @@ router.get('/', async (req, res, next) => {
     // Ensure every order has defaults to avoid frontend crashes
     const safeOrders = orders.map(order => ({
       ...order,
-      customerAddress: order.customerAddress || '',
+      customer: order.customer || { name: 'Unknown', phone: 'N/A', city: 'N/A' },
       items: order.items || [],
-      status: order.status || 'PENDING'
+      status: order.status || 'PENDING',
+      total: order.total || 0,
+      createdAt: order.createdAt || new Date()
     }));
 
     res.json({ success: true, data: safeOrders });
