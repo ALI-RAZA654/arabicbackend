@@ -10,6 +10,20 @@ const errorHandler = require('./middleware/errorHandler');
 // Initialize App
 const app = express();
 
+// Required for Vercel/Proxies
+app.set('trust proxy', 1);
+
+// 1. CORS ALWAYS FIRST
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+}));
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
 // Root/Heartbeat Route to check if API is alive
 app.get('/api/heartbeat', (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
