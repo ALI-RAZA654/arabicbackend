@@ -69,32 +69,70 @@ app.get('/', (req, res) => {
 // Error Handling
 app.use(errorHandler);
 
-// Database Connection
-const PORT = process.env.PORT || 3001;
+// Database Connection (Optimized for Serverless/Vercel)
 const MONGODB_URI = process.env.MONGODB_URI;
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4 // Use IPv4, skip trying IPv6
-};
 
-mongoose.connect(MONGODB_URI, options)
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch(err => {
-    console.error('Database connection error:', err);
-  });
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI is missing from environment variables!');
+}
 
-// Export app for Vercel Serverless Functions
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    const opts = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      maxPoolSize: 1, // Minimize connections for serverless
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      family: 4
+    };
+
+    console.log('Starting NEW database connection...');
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log('MongoDB Connected successfully!');
+      return mongoose;
+    }).catch(err => {
+      console.error('CRITICAL Database Connection Error:', err.message);
+      cached.promise = null; // Reset for next attempt
+      throw err;
+    });
+  }
+  
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+  return cached.conn;
+}
+
+// Ensure DB is connected before every request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database Connection Failed',
+      error: err.message
+    });
+  }
+});
+
+// Export app for Vercel
 module.exports = app;
 
-// Only listen on local environment (Vercel automatically handles listening)
+const PORT = process.env.PORT || 3001;
 if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+  app.listen(PORT, () => console.log(`Local server on ${PORT}`));
 }
