@@ -89,10 +89,11 @@ async function connectDB() {
     const opts = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      maxPoolSize: 1, // Minimize connections for serverless
+      maxPoolSize: 10,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      family: 4
+      family: 4,
+      bufferCommands: false
     };
 
     console.log('Starting NEW database connection...');
@@ -121,10 +122,12 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
+    console.error('DB Middleware Error:', err.message);
     res.status(500).json({ 
       success: false, 
       message: 'Database Connection Failed',
-      error: err.message
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : 'Check Vercel Logs'
     });
   }
 });
