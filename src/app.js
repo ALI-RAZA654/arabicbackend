@@ -21,28 +21,6 @@ app.get('/api/heartbeat', (req, res) => {
   });
 });
 
-// Security Middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
-
-const allowedOrigins = [
-  'https://freezdry.net',
-  'https://www.freezdry.net',
-  'https://arabic-frontend.vercel.app',
-  'https://lightgreen-woodcock-596987.hostingersite.com',
-  'http://localhost:5173'
-];
-
-app.use(cors({
-  origin: true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
 // Serve Uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
